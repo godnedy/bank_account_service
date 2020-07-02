@@ -32,7 +32,7 @@ public class BankService {
     AccountService accountService;
 
     @Transactional
-    public boolean createAccount(CreateAccountRequest request) {  //TODO test czy mozna dwa razy zapisac
+    public boolean createAccount(CreateAccountRequest request) {
         try {
             User user = userService.createUser(request.getFullName(), request.getPersonalIdNumber());
             accountService.createAccount(user.getId(), Currency.PLN, request.getInitialBalance());

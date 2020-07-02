@@ -28,7 +28,7 @@ import static org.springframework.http.HttpStatus.OK;
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-@RequestMapping("/api/accounts")
+@RequestMapping("/api/user")
 public class BankController {
 
     BankService bankService;
