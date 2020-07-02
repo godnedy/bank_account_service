@@ -4,7 +4,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import spock.lang.Specification
 
 @SpringBootTest
-class NotesServiceAppSpec extends Specification {
+class BankAccountAppSpec extends Specification {
 
     def "contextLoads" () {
         def a=0

@@ -3,7 +3,7 @@ create table if not exists USER (
   PERSONAL_IDENTITY_NUMBER char(11)     not null,
   FULL_NAME                varchar(200) not null,
   primary key (ID),
-  constraint unique_personal_identity_number UNIQUE KEY (PERSONAL_IDENTITY_NUMBER)
+  UNIQUE KEY unique_personal_identity_number (PERSONAL_IDENTITY_NUMBER)
 );
 
 create table if not exists SUB_ACCOUNT (
@@ -13,7 +13,7 @@ create table if not exists SUB_ACCOUNT (
   BALANCE double not null,
   primary key (ID),
   constraint SUB_ACCOUNT_USER_FK FOREIGN KEY (USER_ID) references USER (ID),
-  constraint SUB_ACCOUNT_UNIQUE_USER_ID_CURRENCY unique (USER_ID, CURRENCY)
+  UNIQUE  KEY SUB_ACCOUNT_UNIQUE_USER_ID_CURRENCY (USER_ID, CURRENCY)
 );
 
 create index USER_PERSONAL_IDENTITY_NUMBER_IDX on USER(PERSONAL_IDENTITY_NUMBER);
