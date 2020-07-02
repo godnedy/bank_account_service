@@ -1,44 +1,33 @@
 package com.godnedy.bank.account;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.UUID;
 
-@Entity
-@Data
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
 @AllArgsConstructor
-@NoArgsConstructor
-@Table(name = "SUB_ACCOUNT")
 public class Account {
 
-    @Id
-    private UUID id;
-    private Currency currency;
-    private Double balance;
-    private UUID userId;
+    private final UUID id;
+    private final Currency currency;
+    private BigDecimal balance;
+    private final UUID userId;
 
-    static Account from(UUID userId, Currency currency, Double initialBalance) {
-        Account account = new Account();
-        account.setId(UUID.randomUUID());
-        account.setCurrency(currency);
-        account.setBalance(initialBalance);
-        account.setUserId(userId);
-        return account;
+    static Account of(AccountEntity accountEntity) {
+        BigDecimal balance = BigDecimal.valueOf(accountEntity.getBalance());
+        balance = balance.setScale(2, RoundingMode.HALF_EVEN);
+        return new Account(accountEntity.getId(), accountEntity.getCurrency(), balance, accountEntity.getUserId());
     }
 
-    static Account from(AccountModel model) {
-        Account account = new Account();
-        account.setId(model.getId());
-        account.setCurrency(model.getCurrency());
-        account.setBalance(Double.valueOf(model.getBalance().toString()));
-        account.setUserId(model.getUserId());
-        return account;
+    void addToAccount(BigDecimal amount) {
+        this.balance = this.balance.add(amount);
     }
+
+    void withdrawFromAccount(BigDecimal amount) {
+        this.balance = this.balance.subtract(amount);
+    }
+
 }

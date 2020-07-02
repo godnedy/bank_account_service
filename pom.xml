@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.godnedy</groupId>
-    <artifactId>bank-account-service</artifactId>
+    <artifactId>bank-accountEntity-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>action-storage</name>
     <description>Demo project for Spring Boot</description>
@@ -45,6 +45,12 @@
         <!--<artifactId>mysql-connector-java</artifactId>-->
         <!--<scope>runtime</scope>-->
         <!--</dependency>-->
+        <dependency>
+            <groupId>com.github.tomakehurst</groupId>
+            <artifactId>wiremock</artifactId>
+            <version>1.58</version>
+        </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface UserRepository extends CrudRepository<User, UUID> {
+public interface UserRepository extends CrudRepository<UserEntity, UUID> {
 
-    Optional<User> findByPersonalIdentityNumber(String personalIdentityNumber);
+    Optional<UserEntity> findByPersonalIdNumber(String personalIdNumber);
 }

@@ -1,11 +1,11 @@
 package com.godnedy.bank.api;
 
-import com.godnedy.bank.user.PeselValidator;
-import lombok.Data;
-
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import com.godnedy.bank.user.PersonalIdNumberValidator;
+import lombok.Data;
 
 @Data
 public class CreateAccountRequest {
@@ -18,9 +18,9 @@ public class CreateAccountRequest {
 
     @Size(min = 11, max = 11)
     @NotEmpty
-    String peselNumber;
+    String personalIdNumber;
 
     boolean isValid() {
-        return PeselValidator.validate(peselNumber);
-    }  //TODO ewt pesel jako obiekt
+        return PersonalIdNumberValidator.validate(personalIdNumber);
+    }
 }

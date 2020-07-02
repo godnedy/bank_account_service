@@ -1,7 +1,7 @@
 package com.godnedy.bank.account;
 
-class InsufficientFundsException extends RuntimeException {
-    public InsufficientFundsException() {
+public class InsufficientFundsException extends RuntimeException {
+    InsufficientFundsException() {
         super();
     }
 }

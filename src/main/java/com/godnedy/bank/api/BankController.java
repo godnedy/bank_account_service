@@ -2,9 +2,9 @@ package com.godnedy.bank.api;
 
 import com.godnedy.bank.BankService;
 import com.godnedy.bank.ExchangeData;
-import com.godnedy.bank.user.UserInfoResponse;
-import com.godnedy.bank.user.UserNotFoundException;
-import com.godnedy.boundary.ExchangeServiceClient;
+import com.godnedy.bank.UserNotFoundException;
+import com.godnedy.bank.account.InsufficientFundsException;
+import com.godnedy.bank.user.SameUserExistsException;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
@@ -33,30 +33,25 @@ public class BankController {
 
     BankService bankService;
 
-    ExchangeServiceClient client;
-
-
     @PostMapping
     public ResponseEntity createAccount(@Validated @RequestBody CreateAccountRequest request) {
         if (!request.isValid()) {
             return new ResponseEntity<>(BAD_REQUEST);
         }
-        return bankService.createAccount(request) ? new ResponseEntity<>(CREATED) : new ResponseEntity<>(CONFLICT); //tutaj to oznacza, ze sie nie utworzyl bo
+        return bankService.createAccount(request) ? new ResponseEntity<>(CREATED) : new ResponseEntity<>(CONFLICT);
     }
 
+    @GetMapping("/{personalIdNumber}")
+    public ResponseEntity getUserInfo(@PathVariable String personalIdNumber) {
+        return new ResponseEntity<>(bankService.getUserInfo(personalIdNumber), OK);
+    }
 
-    @PostMapping("/{peselNumber}/exchange")
-    public ResponseEntity exchange(@PathVariable String peselNumber, @Validated @RequestBody ExchangeRequest request) {
+    @PostMapping("/{personalIdNumber}/exchange")
+    public ResponseEntity exchange(@PathVariable String personalIdNumber, @Validated @RequestBody ExchangeRequest request) {
         ExchangeData exchangeData = ExchangeData.from(request.currencyFrom, request.currencyTo, request.amount);
-        return bankService.exchange(peselNumber, exchangeData)
+        return bankService.exchange(personalIdNumber, exchangeData)
                 ? new ResponseEntity<>(OK)
                 : new ResponseEntity<>(BAD_REQUEST);
-    }
-
-    @GetMapping("/{peselNumber}")
-    public ResponseEntity getUserInfo(@PathVariable String peselNumber) {
-        UserInfoResponse userInfo = bankService.getUserInfo(peselNumber);
-        return new ResponseEntity<>(userInfo, OK);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -66,6 +61,14 @@ public class BankController {
 
     @ExceptionHandler(UserNotFoundException.class)
     @ResponseStatus(NOT_FOUND)
-    public void handleException(UserNotFoundException e) {
+    public void handleUserNotFoundException(UserNotFoundException e) {
     }
+
+    @ExceptionHandler(InsufficientFundsException.class)
+    @ResponseStatus(BAD_REQUEST)
+    public void handleInsufficientFundsException() {}
+
+    @ExceptionHandler(SameUserExistsException.class)
+    @ResponseStatus(CONFLICT)
+    public void handleSameUserExistsException() {}
 }

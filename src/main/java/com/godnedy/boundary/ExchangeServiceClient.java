@@ -10,7 +10,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import static lombok.AccessLevel.PRIVATE;
@@ -26,6 +26,7 @@ public class ExchangeServiceClient {
     private static final String CURRENCY_RATE_PATH = "/api/exchangerates/rates/c/{currency}/last/1/";
 
     String baseUrl;
+
     RestTemplate restTemplate;
 
     @Autowired
@@ -39,9 +40,9 @@ public class ExchangeServiceClient {
             ResponseEntity<ExchangeRateResponse> response = restTemplate.exchange(
                     uriFor(CURRENCY_RATE_PATH, currency), GET, httpEntity(), ExchangeRateResponse.class);
             return response.getBody();
-        } catch (HttpClientErrorException e) {
+        } catch (RestClientException e) {
             log.error("Rate for currency {} not found", currency);
-            throw new RuntimeException("clcl");
+            throw new ImpossibleToProvideRateByExternalServiceException();
         }
     }
 

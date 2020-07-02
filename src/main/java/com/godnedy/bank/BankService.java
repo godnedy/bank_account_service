@@ -1,17 +1,11 @@
 package com.godnedy.bank;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import com.godnedy.bank.account.AccountService;
 import com.godnedy.bank.account.Currency;
+import com.godnedy.bank.api.AccountInfo;
 import com.godnedy.bank.api.CreateAccountRequest;
-import com.godnedy.bank.user.AccountInfo;
-import com.godnedy.bank.user.UserInfoResponse;
-import com.godnedy.bank.user.UserModel;
-import com.godnedy.bank.user.UserNotFoundException;
-import com.godnedy.bank.user.UserService;
+import com.godnedy.bank.api.UserInfoResponse;
+import com.godnedy.bank.user.*;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Delegate;
 import lombok.experimental.FieldDefaults;
@@ -19,6 +13,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static lombok.AccessLevel.PRIVATE;
 
@@ -34,22 +32,22 @@ public class BankService {
     AccountService accountService;
 
     @Transactional
-    public boolean createAccount(CreateAccountRequest request) {
+    public boolean createAccount(CreateAccountRequest request) {  //TODO test czy mozna dwa razy zapisac
         try {
-            UserModel user = userService.createUser(request.getPeselNumber(), request.getFullName());
+            User user = userService.createUser(request.getFullName(), request.getPersonalIdNumber());
             accountService.createAccount(user.getId(), Currency.PLN, request.getInitialBalance());
             accountService.createAccount(user.getId(), Currency.USD, 0.00d);
 
         } catch (DataAccessException e) {
-            log.error(String.format("Failed to create user with pesel number %s", request.getPeselNumber()));
+            log.error(String.format("Failed to create user with personal id number %s", request.getPersonalIdNumber()));
             return false;
         }
         return true;
     }
 
-    public UserInfoResponse getUserInfo(String peselNumber) {
-        Optional<UserModel> user = userService.findUser(peselNumber);
-        if(!user.isPresent()) {
+    public UserInfoResponse getUserInfo(String personalIdNumber) {
+        Optional<User> user = userService.findUser(personalIdNumber);
+        if (!user.isPresent()) {
             throw new UserNotFoundException();
         }
         List<AccountInfo> userAccounts = accountService.getUserAccounts(user.get().getId())
@@ -60,9 +58,12 @@ public class BankService {
     }
 
     @Transactional
-    public boolean exchange (String peselNumber, ExchangeData exchangeData) {
-       return userService.findUser(peselNumber)
-               .map(userModel -> accountService.exchange(userModel.getId(), exchangeData))
-               .orElse(false);
+    public boolean exchange(String personalIdNumber, ExchangeData exchangeData) {
+        Optional<User> user = userService.findUser(personalIdNumber);
+        if(!user.isPresent()) {
+            throw new UserNotFoundException();
+        }
+        return user.map(userModel -> accountService.exchange(userModel.getId(), exchangeData))
+                .orElse(false);
     }
 }

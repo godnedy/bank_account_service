@@ -16,12 +16,16 @@ public class UserService {
 
     UserRepository userRepository;
 
-    public Optional<UserModel> findUser(String pesel) {
-        return userRepository.findByPersonalIdentityNumber(pesel).map(UserModel::of);
+    public Optional<User> findUser(String personalIdNumber) {
+        return userRepository.findByPersonalIdNumber(personalIdNumber).map(User::of);
     }
 
-    public UserModel createUser(String fullName, String pesel) {
-        User user = User.from(pesel, fullName);
-        return UserModel.of(userRepository.save(user));
+    public User createUser(String fullName, String personalIdNumber) {
+        Optional<UserEntity> byPersonalIdNumber = userRepository.findByPersonalIdNumber(personalIdNumber);
+        if(byPersonalIdNumber.isPresent()) {
+            throw new SameUserExistsException();
+        }
+        UserEntity userEntity = UserEntity.from(personalIdNumber, fullName);
+        return User.of(userRepository.save(userEntity));
     }
 }
